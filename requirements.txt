@@ -1,0 +1,6 @@
+ujson
+msgpack
+parquet
+protobuf
+bson
+cbor
