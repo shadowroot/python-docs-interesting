@@ -8,14 +8,14 @@ import string
 
 class DataFuzzer():
 
-    NOT_EXPANDABLE_TYPES = set("bytes", "str", "int", "float")
-    EXPANDABLE_TYPES = set("dict", "list", "set")
+    NOT_EXPANDABLE_TYPES = set(["bytes", "str", "int", "float"])
+    EXPANDABLE_TYPES = set(["dict", "list", "set"])
     MAX_SIZE = 4*1024*1024*1024
     MAX_ELEMENTS_ON_LEVEL = 100
     AVOID_TYPES = []
     CALC_TIMEOUT = 100
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         self._current_level = 0
         self._current_size = 0
         self._min_levels = 0
@@ -24,12 +24,12 @@ class DataFuzzer():
         self._depth = 0
 
         if kwargs is not None:
-            self.__dict__.update(kwargs)
+            self.__dict__.update(**kwargs)
         else:
             raise ValueError("No configuration was provided")
 
     def _validate_conf(self):
-        if self._type not in set(self.EXPANDABLE_TYPES, self.NOT_EXPANDABLE_TYPES):
+        if self._type not in self.NOT_EXPANDABLE_TYPES and self._type not in self.EXPANDABLE_TYPES:
             raise ValueError("Invalid type")
         if self._type == "dict" and (not hasattr(self, "_depth") or self._depth > 200):
             raise ValueError("Invalid depth for dict")
@@ -64,6 +64,9 @@ class DataFuzzer():
                 if (len(bytes_generated_value) + self._current_size + elements_on_level + self._depth - self._current_level) <= self._size:
                     ok = True
         return generated_value, bytes_generated_value
+
+    def generate_dict(self):
+        return self._generate_dict()
 
     def _generate_dict(self):
         """Universal struct for now"""
